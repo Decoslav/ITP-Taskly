@@ -1,0 +1,15 @@
+.navbar {
+    background-color: #000; 
+}
+.navbar .nav-link, 
+.navbar .navbar-brand, 
+.navbar-text {
+    color: white !important; 
+}
+.navbar .nav-link:hover {
+    color: #ccc; 
+}
+.nav-fill .nav-item {
+    flex: 1; 
+    text-align: center; 
+}
