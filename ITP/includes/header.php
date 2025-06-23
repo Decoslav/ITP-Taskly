@@ -25,9 +25,15 @@ session_start();
                     <li class="nav-item">
                         <a class="nav-link" href="index.php">Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="calendar.php">Kalender</a>
-                    </li>
+                        <?php if(isset($_SESSION['username'])): ?>
+                            <li class="nav-item">
+                                <a class="nav-link" href="calendar.php">Kalender</a>
+                            </li>
+                       <?php else: ?>
+                            <li class="nav-item">
+                                <a class="nav-link" href="login.php">Kalender</a>
+                            </li>
+                       <?php endif; ?>
                 </ul>
 
                 <ul class="navbar-nav ms-auto">
