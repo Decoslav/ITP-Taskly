@@ -128,7 +128,7 @@
               endTimestamp = Math.floor(endOfWeek.getTime() / 1000);
           }
 
-          const url = `fetch_tasks.php?start=${startTimestamp}&end=${endTimestamp}`;
+          const url = `fetch_task.php?start=${startTimestamp}&end=${endTimestamp}`;
           const response = await fetch(url);
           const data = await response.json();
 

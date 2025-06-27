@@ -15,7 +15,7 @@
             exit();
         }
 
-        $sql = "DELETE FROM termine WHERE termin_id = ? AND benutzer_id = ?";
+        $sql = "DELETE FROM termine WHERE id = ? AND benutzer_id = ?";
 
         if ($stmt = $conn->prepare($sql)) 
         {
