@@ -19,6 +19,7 @@
       <option value="year">Jahresansicht</option>
       <option value="month">Monatsansicht</option>
       <option value="week">Wochenansicht</option>
+      <option value="day">Tagesansicht</option>
     </select>
   </div>
   <div id="calendarGrid"></div>
@@ -55,17 +56,19 @@
 
   document.getElementById("prev").addEventListener("click", () => {
     if (viewMode === "year") currentDate.setFullYear(currentDate.getFullYear() - 1);
-    if (viewMode === "month") currentDate.setMonth(currentDate.getMonth() - 1);
-    if (viewMode === "week") currentDate.setDate(currentDate.getDate() - 7);
+    else if (viewMode === "month") currentDate.setMonth(currentDate.getMonth() - 1);
+    else if (viewMode === "week") currentDate.setDate(currentDate.getDate() - 7);
+    else if (viewMode === "day") currentDate.setDate(currentDate.getDate() - 1);
     render();
-  });
+});
 
   document.getElementById("next").addEventListener("click", () => {
     if (viewMode === "year") currentDate.setFullYear(currentDate.getFullYear() + 1);
-    if (viewMode === "month") currentDate.setMonth(currentDate.getMonth() + 1);
-    if (viewMode === "week") currentDate.setDate(currentDate.getDate() + 7);
+    else if (viewMode === "month") currentDate.setMonth(currentDate.getMonth() + 1);
+    else if (viewMode === "week") currentDate.setDate(currentDate.getDate() + 7);
+    else if (viewMode === "day") currentDate.setDate(currentDate.getDate() + 1);
     render();
-  });
+});
 
   viewSelect.addEventListener("change", () => {
     viewMode = viewSelect.value;
@@ -165,6 +168,10 @@
       grid.style.gridTemplateColumns = "1fr";
       grid.style.justifyContent = "center";
       renderWeek(currentDate);
+    } else if (viewMode === "day") {
+      grid.style.gridTemplateColumns = "1fr";
+      grid.style.justifyContent = "center";
+      renderDay(currentDate);
     }
   }
 
@@ -237,14 +244,74 @@
     grid.appendChild(week);
   }
 
+  function renderDay(date) {
+    titleDisplay.textContent = date.toLocaleDateString("de-DE", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+
+    const dayContainer = document.createElement("div");
+    dayContainer.className = "day-view";
+
+    /*const header = document.createElement("h3");
+    header.textContent = date.toLocaleDateString("de-DE", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+
+    dayContainer.appendChild(header); */
+
+    const timeGrid = document.createElement("div");
+    timeGrid.className = "time-grid";
+
+    for (let h = 0; h < 24; h++) {
+      const hourBlock = document.createElement("div");
+      hourBlock.className = "hour-block";
+
+      const timeLabel = document.createElement("strong");
+      timeLabel.textContent = `${h}:00`;
+      hourBlock.appendChild(timeLabel);
+      
+      const tasksInHour = userTasks.filter(task => {
+        const taskDate = new Date(task.datum_unix * 1000);
+        return taskDate.getFullYear() === date.getFullYear() &&
+               taskDate.getMonth() === date.getMonth() &&
+               taskDate.getDate() === date.getDate() &&
+               taskDate.getHours() === h;
+      });
+
+      tasksInHour.forEach(task => {
+        const taskBlock = document.createElement("div"); 
+        taskBlock.textContent = task.beschreibung;
+        taskBlock.className = "task-in-hour";
+        
+        const taskDate = new Date(task.datum_unix * 1000);
+        const startHour = taskDate.getHours();
+        const startMinutes = taskDate.getMinutes();
+
+        const top = startMinutes; 
+        const height = 30;
+
+        taskBlock.style.top = `${top}px`;
+        taskBlock.style.height = `${height}px`;
+
+        hourBlock.appendChild(taskBlock);
+      }); 
+      
+      hourBlock.addEventListener("click", () => {
+        const clicked = new Date(date);
+        clicked.setHours(h, 0, 0, 0);
+        onDayClick(clicked);
+      });
+
+      timeGrid.appendChild(hourBlock);
+    }
+    dayContainer.appendChild(timeGrid);
+    grid.appendChild(dayContainer); 
+  }
+
   function createMonthElement(date) 
   {
     const monthEl = document.createElement("div");
     monthEl.className = "month";
 
-    const header = document.createElement("h3");
+    /* const header = document.createElement("h3");
     header.textContent = date.toLocaleString("de-DE", { month: "long", year: "numeric" });
-    monthEl.appendChild(header);
+    monthEl.appendChild(header); */
 
     const wrapper = document.createElement("div");
     wrapper.appendChild(createWeekdayHeader());
