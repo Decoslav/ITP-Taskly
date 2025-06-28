@@ -9,7 +9,7 @@
     $start_timestamp = isset($_GET['start']) ? (int)$_GET['start'] : null;
     $end_timestamp = isset($_GET['end']) ? (int)$_GET['end'] : null;
 
-    $sql = "SELECT id as termin_id, start_time as datum_unix, titel as beschreibung FROM termine WHERE benutzer_id = ?";
+    $sql = "SELECT id as termin_id, start_time as datum_unix, end_time, titel as beschreibung, all_day FROM termine WHERE benutzer_id = ?";
     $params = [$userId];
     $types = "i";
 
@@ -36,6 +36,7 @@
             $result = $stmt->get_result();
             while ($row = $result->fetch_assoc()) 
             {
+                $row['all_day'] = (bool)$row['all_day'];
                 $tasks[] = $row;
             }
             echo json_encode(['success' => true, 'tasks' => $tasks]);

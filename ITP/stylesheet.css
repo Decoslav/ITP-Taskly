@@ -4,6 +4,7 @@ body {
     margin: 0;
 }
 
+/* Navbar Styles */
 .navbar {
     background-color: #000;
 }
@@ -23,6 +24,7 @@ body {
     text-align: center;
 }
 
+/* Calendar Container */
 .calendar-container {
     max-width: 1200px;
     margin: 2rem auto;
@@ -32,6 +34,7 @@ body {
     box-shadow: 0 0 20px rgba(0,0,0,0.05);
 }
 
+/* Controls (Buttons, Selects) */
 .controls {
     display: flex;
     justify-content: space-between;
@@ -57,6 +60,7 @@ body {
     background: #575757;
 }
 
+/* Calendar Grid (General) */
 #calendarGrid {
     display: grid;
     gap: 1.25rem;
@@ -64,8 +68,9 @@ body {
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
 
+/* Month View Specifics */
 #calendarGrid.month {
-    display: flex;
+    display: flex; /* Overrides grid for month view container layout */
     justify-content: center;
     max-width: 900px;
     margin: 0 auto;
@@ -81,7 +86,8 @@ body {
 }
 
 .month h3,
-.week h3 {
+.week h3,
+.day-view h3 {
     text-align: center;
     margin-bottom: 1rem;
     color: #333;
@@ -101,11 +107,12 @@ body {
 .month .days {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    grid-auto-rows: 110px;
+    grid-auto-rows: 110px; 
     gap: 0.5rem;
     font-size: 1rem;
 }
 
+/* Week View Specifics */
 .week .days {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -113,6 +120,7 @@ body {
     font-size: 1rem;
 }
 
+/* Individual Day Blocks (Month/Week View) */
 .day {
     position: relative;
     aspect-ratio: 1 / 1;
@@ -129,18 +137,14 @@ body {
     transition: background 0.2s ease-in-out, transform 0.1s ease;
 }
 
-#calendarGrid:not(.day) .day:hover {
+/* Hover effects for days (not in day view) */
+#calendarGrid:not(.day-view) .day:hover { 
     background: #757575;
     color: white;
     transform: scale(1.05);
 }
 
-.day-view .hour-block:hover {
-    background: #757575;
-    color: white;
-    transform: scale(1.05);
-}
-
+/* Today's Day Indicator */
 .day.today {
     background: #ffe082 !important;
     font-weight: bold;
@@ -148,6 +152,26 @@ body {
     color: #000;
 }
 
+/* Day with Task Indicator (Month/Week/Year views) */
+.day.has-task {
+    background-color: #e6ffe6;
+    border: 1px solid #66bb6a;
+    position: relative;
+}
+
+.day.has-task::after {
+    content: '';
+    position: absolute;
+    bottom: 3px;
+    right: 3px;
+    width: 6px;
+    height: 6px;
+    background-color: #ff0000; /* Red dot */
+    border-radius: 50%;
+}
+
+
+/* Year View Specifics */
 #calendarGrid.year {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
     justify-content: center;
@@ -161,7 +185,7 @@ body {
 }
 
 #calendarGrid.year .month .days {
-    grid-auto-rows: 80px;
+    grid-auto-rows: 80px; /* Shorter rows for year view */
 }
 
 #calendarGrid.year .day {
@@ -189,6 +213,7 @@ body {
     margin: 0 auto;
 }
 
+/* Modal Styles (General) */
 .modal {
     display: none;
     position: fixed;
@@ -227,7 +252,8 @@ body {
     cursor: pointer;
 }
 
-#tasksList div {
+/* Task List in Modals (if applicable) */
+#tasksList div { /* This likely targets task items within a modal list */
     padding: 0.75rem;
     margin-bottom: 0.5rem;
     border: 1px solid #ddd;
@@ -252,6 +278,7 @@ body {
     background-color: #c62828;
 }
 
+/* Add Task Form in Modals */
 #addTaskForm {
     margin-top: 20px;
     border-top: 1px solid #eee;
@@ -285,24 +312,141 @@ body {
     background-color: #45a049;
 }
 
-/* Calendar day indicator for tasks */
-.day.has-task {
-    background-color: #e6ffe6; /* Light green background */
-    border: 1px solid #66bb6a; /* Green border */
-    position: relative; /* For the dot */
+
+/* Form Grouping for Inputs (e.g., in modals) */
+.form-group {
+    margin-bottom: 1rem;
 }
 
-.day.has-task::after {
-    content: '';
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #555;
+}
+
+.time-selection {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.time-row {
+    display: flex;
+    width: 100%;
+    gap: 1rem;
+}
+
+.time-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.time-group label {
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+    color: #777;
+}
+
+.time-selection input[type="time"] {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+}
+
+/* Checkbox Styles */
+.checkbox-container {
+    display: block;
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 1rem;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    color: #333;
+}
+
+.checkbox-container input {
     position: absolute;
-    bottom: 3px;
-    right: 3px;
-    width: 6px;
-    height: 6px;
-    background-color: #ff0000; /* Red dot */
-    border-radius: 50%;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
 }
 
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: #eee;
+    border-radius: 4px;
+}
+
+.checkbox-container:hover input ~ .checkmark {
+    background-color: #ccc;
+}
+
+.checkbox-container input:checked ~ .checkmark {
+    background-color: #2196F3;
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.checkbox-container .checkmark:after {
+    left: 7px;
+    top: 3px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+
+/* Task Item Styles (Generic, likely for modal lists) */
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    background: #f9f9f9;
+}
+
+.task-item .delete-btn {
+    margin-left: 1rem;
+}
+
+.task-text.all-day-task {
+    color: #388e3c;
+    font-weight: 600;
+}
+
+.task-text.timed-task {
+    color: #e65100;
+    font-weight: 600;
+}
+
+/* Animations */
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -313,54 +457,137 @@ body {
     to { transform: translateY(0); opacity: 1; }
 }
 
+
+/* DAY VIEW (TAGESANSICHT) SPECIFIC STYLES */
+
 .day-view {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: #f9f9f9;
-  padding: 2rem;
-  border-radius: 1rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #f9f9f9;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .time-grid {
-  display: grid; 
-  grid-template-rows: repeat(48, 1fr);
-  position: relative;
+    display: grid;
+    grid-template-rows: repeat(24, 1fr); /* 24 rows, each taking equal fraction of space */
+    gap: 0.5rem; /* Gap between hour blocks */
+    width: 100%;
+    position: relative; /* Needed if you want to position anything relative to the grid itself */
 }
 
 .hour-block {
-  background-color: #fff;
-  padding: 1rem 1.5rem;
-  margin: 0.4 rem auto;
-  width: 1000px; 
-  border: 1px solid #ccc;
-  border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: 500;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  text-align: left;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+    background-color: #fff;
+    padding: 1rem 1.5rem; /* Padding for the hour text and tasks */
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    text-align: left;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    min-height: 80px; /* Minimum height for each hour block */
+    position: relative; /* CRUCIAL for the ::after pseudo-element (the dot) */
+    display: flex; /* Use flexbox to stack time and task summary */
+    flex-direction: column;
+    justify-content: flex-start; /* Align content to the top */
+    align-items: flex-start; /* Align content to the left */
+    overflow: hidden; /* Hide anything that overflows the block */
+}
+
+/* Hover effect for hour blocks */
+.day-view .hour-block:hover {
+    background-color: #e0e0e0;
+    transform: scale(1.01);
+    cursor: pointer;
 }
 
 .hour-block strong {
-  font-weight: normal
-}
-.hour-block:hover {
-  background-color: #e0e0e0;
-  transform: scale(1.01);
-  cursor: pointer;
+    font-weight: 600;
+    display: block; /* Ensures it takes its own line */
+    margin-bottom: 0.5rem; /* Space below the hour label */
+    color: #333;
 }
 
+/* NEW: Styles for hour blocks that contain tasks in Day View */
+.hour-block.has-task-in-hour {
+    background-color: #e6ffe6; /* Light green background */
+    border: 1px solid #66bb6a; /* Green border */
+    /* position: relative; is already on .hour-block, so no need to repeat */
+}
+
+/* NEW: Red dot indicator for hour blocks with tasks */
+.hour-block.has-task-in-hour::after {
+    content: '';
+    position: absolute;
+    bottom: 8px; /* Position from bottom */
+    right: 8px; /* Position from right */
+    width: 8px; /* Size of the dot */
+    height: 8px; /* Size of the dot */
+    background-color: #ff0000; /* Red dot color */
+    border-radius: 50%; /* Makes it a circle */
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.5); /* Optional subtle glow */
+}
+
+/* NEW: Container for the task summary text within an hour block */
+.hour-block .tasks-summary {
+    margin-top: 5px; /* Space between time label and task list */
+    font-size: 0.85rem;
+    color: #555;
+    line-height: 1.3;
+    overflow: hidden; /* Hide overflowing text if summary is too long */
+    /* Calculated max-height to ensure it doesn't push the hour-block too much,
+       assuming hourBlock min-height 80px, padding-top 1rem (16px), strong margin-bottom 0.5rem (8px),
+       and tasks-summary margin-top 5px. This leaves about 51px for content. */
+    max-height: calc(80px - 16px - 8px - 5px);
+}
+
+/* NEW: Style for each individual task line in the summary */
+.hour-block .task-display-line {
+    margin: 0; /* Remove default paragraph margins */
+    padding: 2px 0; /* Small vertical padding for separation */
+    white-space: nowrap; /* Keep text on a single line */
+    overflow: hidden; /* Hide text that goes beyond the container */
+    text-overflow: ellipsis; /* Add "..." for hidden text */
+    font-size: 0.8em; /* Slightly smaller text for task entries */
+}
+
+/* NEW: Specific styling for all-day task lines in the summary */
+.hour-block .task-display-line.all-day-task-display {
+    font-weight: bold;
+    color: #388e3c; /* Darker green for all-day tasks */
+}
+
+/* GENERAL TASK IN HOUR (if used in modal for example) - No longer for day view hour blocks */
 .task-in-hour {
-  position: absolute;
-  left: 0;
-  right: 0;
-  margin: 0.2rem;
-  padding: 0.4rem; 
-  background-color: #cdeaff; 
-  border-left: 4px solid #007acc;
-  border-radius: 6px;
-  box-sizing: border-box;
-  overflow: hidden;
+    /* If this class is used to display tasks in other contexts (e.g., in a modal list of tasks),
+       keep its styling as needed. It should NOT be absolutely positioned for the Day View. */
+    padding: 0.4rem;
+    background-color: #e0f2f7;
+    border-left: 4px solid #007acc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 0.95rem;
+    color: #333;
+    z-index: 1;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    position: relative; /* Set to relative if it's meant to flow normally in lists */
+    margin-bottom: 5px; /* Add some spacing if it's a list item */
+}
+
+.task-in-hour.all-day-task {
+    background-color: #dcedc8;
+    border-left-color: #689f38;
+}
+
+.task-in-hour.timed-task {
+    background-color: #ffe0b2;
+    border-left-color: #fb8c00;
 }

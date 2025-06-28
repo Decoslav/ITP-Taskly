@@ -32,6 +32,26 @@
     <div id="tasksList"></div>
     <div id="addTaskForm">
         <input type="text" id="newTaskInput" placeholder="Neue Aufgabe eingeben">
+        <div class="form-group">
+            <label class="checkbox-container">
+                <input type="checkbox" id="allDayCheckbox" checked>
+                <span class="checkmark"></span>
+                Ganztägig
+            </label>
+        </div>
+        <div id="timeSelection" class="time-selection" style="display: none;">
+            <div class="time-row">
+                <div class="time-group">
+                    <label for="startTime">Startzeit:</label>
+                    <input type="time" id="startTime" value="09:00">
+                </div>
+                <div class="time-group">
+                    <label for="endTime">Endzeit:</label>
+                    <input type="time" id="endTime" value="10:00">
+                </div>
+            </div>
+        </div>
+        
         <button id="saveTaskButton">Aufgabe speichern</button>
     </div>
   </div>
@@ -53,6 +73,18 @@
     const tasksList = document.getElementById("tasksList");
     const newTaskInput = document.getElementById("newTaskInput");
     const saveTaskButton = document.getElementById("saveTaskButton");
+    const allDayCheckbox = document.getElementById("allDayCheckbox");
+    const timeSelection = document.getElementById("timeSelection");
+    const startTimeInput = document.getElementById("startTime");
+    const endTimeInput = document.getElementById("endTime");
+
+  allDayCheckbox.addEventListener("change", () => {
+    if (allDayCheckbox.checked) {
+      timeSelection.style.display = "none";
+    } else {
+      timeSelection.style.display = "block";
+    }
+  });
 
   document.getElementById("prev").addEventListener("click", () => {
     if (viewMode === "year") currentDate.setFullYear(currentDate.getFullYear() - 1);
@@ -89,11 +121,39 @@
       const taskText = newTaskInput.value.trim();
       if (taskText && selectedDate) 
       {
-          const timestamp = Math.floor(selectedDate.getTime() / 1000);
-          const success = await saveTaskToDatabase(timestamp, taskText);
+          const isAllDay = allDayCheckbox.checked;
+          let startTimestamp, endTimestamp = null;
+          
+          if (isAllDay) { // For All-Day Tasks it defaults to the beginning of the day
+              const dayStart = new Date(selectedDate);
+              dayStart.setHours(0, 0, 0, 0);
+              startTimestamp = Math.floor(dayStart.getTime() / 1000);
+          } else {
+              const [startHour, startMinute] = startTimeInput.value.split(':').map(Number);
+              const [endHour, endMinute] = endTimeInput.value.split(':').map(Number);
+              
+              const startDateTime = new Date(selectedDate);
+              startDateTime.setHours(startHour, startMinute, 0, 0);
+              startTimestamp = Math.floor(startDateTime.getTime() / 1000);
+              
+              const endDateTime = new Date(selectedDate);
+              endDateTime.setHours(endHour, endMinute, 0, 0);
+              endTimestamp = Math.floor(endDateTime.getTime() / 1000);
+              
+              if (endTimestamp <= startTimestamp) {
+                  alert("Endzeit muss nach der Startzeit liegen!");
+                  return;
+              }
+          }
+          
+          const success = await saveTaskToDatabase(startTimestamp, endTimestamp, taskText, isAllDay);
           if (success) 
           {
               newTaskInput.value = "";
+              allDayCheckbox.checked = true;
+              timeSelection.style.display = "none";
+              startTimeInput.value = "09:00";
+              endTimeInput.value = "10:00";
               await render();
               displayTasksForSelectedDate(selectedDate);
           }
@@ -244,74 +304,93 @@
     grid.appendChild(week);
   }
 
-  function renderDay(date) {
+  function renderDay(date) 
+  {
     titleDisplay.textContent = date.toLocaleDateString("de-DE", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
 
     const dayContainer = document.createElement("div");
     dayContainer.className = "day-view";
 
-    /*const header = document.createElement("h3");
-    header.textContent = date.toLocaleDateString("de-DE", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
-
-    dayContainer.appendChild(header); */
-
     const timeGrid = document.createElement("div");
     timeGrid.className = "time-grid";
 
-    for (let h = 0; h < 24; h++) {
+    for (let h = 0; h < 24; h++) 
+    {
       const hourBlock = document.createElement("div");
       hourBlock.className = "hour-block";
 
       const timeLabel = document.createElement("strong");
       timeLabel.textContent = `${h}:00`;
       hourBlock.appendChild(timeLabel);
-      
-      const tasksInHour = userTasks.filter(task => {
-        const taskDate = new Date(task.datum_unix * 1000);
-        return taskDate.getFullYear() === date.getFullYear() &&
-               taskDate.getMonth() === date.getMonth() &&
-               taskDate.getDate() === date.getDate() &&
-               taskDate.getHours() === h;
+
+      const currentHourStart = new Date(date.getFullYear(), date.getMonth(), date.getDate(), h, 0, 0, 0);
+      const currentHourEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), h + 1, 0, 0, 0);
+
+      const tasksIntersectingHour = userTasks.filter(task => {
+          const taskStartDate = new Date(task.datum_unix * 1000);
+          const taskEndDate = task.end_time ? new Date(task.end_time * 1000) : null;
+
+          if (task.all_day) 
+          {
+              const taskDayStart = new Date(taskStartDate);
+              taskDayStart.setHours(0, 0, 0, 0);
+              const currentDayStart = new Date(date);
+              currentDayStart.setHours(0, 0, 0, 0);
+              return taskDayStart.getTime() === currentDayStart.getTime();
+          } else {
+              const taskStartTimestamp = taskStartDate.getTime();
+              const taskEndTimestamp = taskEndDate ? taskEndDate.getTime() : taskStartTimestamp;
+              const startsIn = taskStartTimestamp >= currentHourStart.getTime() && taskStartTimestamp < currentHourEnd.getTime();
+              const endsIn = taskEndTimestamp > currentHourStart.getTime() && taskEndTimestamp <= currentHourEnd.getTime();
+              const spansAcross = taskStartTimestamp < currentHourStart.getTime() && taskEndTimestamp > currentHourEnd.getTime();
+
+              return startsIn || endsIn || spansAcross;
+          }
       });
 
-      tasksInHour.forEach(task => {
-        const taskBlock = document.createElement("div"); 
-        taskBlock.textContent = task.beschreibung;
-        taskBlock.className = "task-in-hour";
-        
-        const taskDate = new Date(task.datum_unix * 1000);
-        const startHour = taskDate.getHours();
-        const startMinutes = taskDate.getMinutes();
+        tasksIntersectingHour.sort((a, b) => (new Date(a.datum_unix * 1000)).getTime() - (new Date(b.datum_unix * 1000)).getTime());
 
-        const top = startMinutes; 
-        const height = 30;
+        if (tasksIntersectingHour.length > 0) 
+        {
+            hourBlock.classList.add("has-task-in-hour"); 
+            const taskListDiv = document.createElement("div");
+            taskListDiv.className = "tasks-summary";
+            hourBlock.appendChild(taskListDiv);
+            tasksIntersectingHour.forEach(task => {
+                const taskLine = document.createElement("p");
+                taskLine.className = "task-display-line"; 
 
-        taskBlock.style.top = `${top}px`;
-        taskBlock.style.height = `${height}px`;
+                let taskText = task.beschreibung;
+                if (!task.all_day) {
+                    const startTime = new Date(task.datum_unix * 1000);
+                    const endTime = task.end_time ? new Date(task.end_time * 1000) : null;
+                    const startStr = startTime.toLocaleTimeString("de-DE", { hour: '2-digit', minute: '2-digit' });
+                    const endStr = endTime ? endTime.toLocaleTimeString("de-DE", { hour: '2-digit', minute: '2-digit' }) : '';
+                    taskText = `${startStr}${endStr ? ' - ' + endStr : ''} ${taskText}`;
+                } else {
+                    taskLine.classList.add("all-day-task-display");
+                }
+                taskLine.textContent = taskText;
+                taskListDiv.appendChild(taskLine);
+            });
+        }
 
-        hourBlock.appendChild(taskBlock);
-      }); 
-      
-      hourBlock.addEventListener("click", () => {
-        const clicked = new Date(date);
-        clicked.setHours(h, 0, 0, 0);
-        onDayClick(clicked);
-      });
+        hourBlock.addEventListener("click", () => {
+            const clicked = new Date(date);
+            clicked.setHours(h, 0, 0, 0);
+            onDayClick(clicked);
+        });
 
-      timeGrid.appendChild(hourBlock);
+        timeGrid.appendChild(hourBlock);
     }
     dayContainer.appendChild(timeGrid);
-    grid.appendChild(dayContainer); 
+    grid.appendChild(dayContainer);
   }
 
   function createMonthElement(date) 
   {
     const monthEl = document.createElement("div");
     monthEl.className = "month";
-
-    /* const header = document.createElement("h3");
-    header.textContent = date.toLocaleString("de-DE", { month: "long", year: "numeric" });
-    monthEl.appendChild(header); */
 
     const wrapper = document.createElement("div");
     wrapper.appendChild(createWeekdayHeader());
@@ -375,12 +454,13 @@
     return header;
   }
 
-
-  async function saveTaskToDatabase(timestamp, task)
+  async function saveTaskToDatabase(startTimestamp, endTimestamp, task, isAllDay)
   {
     const formData = new FormData();
-    formData.append('timestamp', timestamp);
+    formData.append('start_timestamp', startTimestamp);
+    formData.append('end_timestamp', endTimestamp || '');
     formData.append('task', task);
+    formData.append('all_day', isAllDay ? '1' : '0');
 
     try {
       const response = await fetch('save_task.php',
@@ -450,13 +530,35 @@
     if (tasksOnThisDay.length > 0) {
         tasksOnThisDay.forEach(task => {
             const taskDiv = document.createElement("div");
+            taskDiv.className = "task-item";
+            
+            let taskDisplayText = task.beschreibung;
+            let taskTypeClass = "";
+            
+            if (task.all_day) {
+                taskDisplayText += " (Ganztägig)";
+                taskTypeClass = "all-day-task";
+            } else {
+                const startTime = new Date(task.datum_unix * 1000);
+                const startStr = startTime.toLocaleTimeString("de-DE", { hour: '2-digit', minute: '2-digit' });
+                
+                if (task.end_time) {
+                    const endTime = new Date(task.end_time * 1000);
+                    const endStr = endTime.toLocaleTimeString("de-DE", { hour: '2-digit', minute: '2-digit' });
+                    taskDisplayText += ` (${startStr} - ${endStr})`;
+                } else {
+                    taskDisplayText += ` (${startStr})`;
+                }
+                taskTypeClass = "timed-task";
+            }
+            
             taskDiv.innerHTML = `
-                <span>${task.beschreibung}</span>
-                <button data-termin-id="${task.termin_id}">Löschen</button>
+                <span class="task-text ${taskTypeClass}">${taskDisplayText}</span>
+                <button class="delete-btn" data-termin-id="${task.termin_id}">Löschen</button>
             `;
             tasksList.appendChild(taskDiv);
 
-            taskDiv.querySelector('button').addEventListener('click', (event) => {
+            taskDiv.querySelector('.delete-btn').addEventListener('click', (event) => {
                 const terminIdToDelete = event.target.dataset.terminId;
                 deleteTaskFromDatabase(terminIdToDelete);
             });
@@ -468,24 +570,34 @@
     }
   }
 
-
 function onDayClick(date) 
 {
   selectedDate = date;
+  
+  if (date.getHours() !== 0 || date.getMinutes() !== 0) {
+    const startHour = String(date.getHours()).padStart(2, '0');
+    const startMinute = String(date.getMinutes()).padStart(2, '0');
+    startTimeInput.value = `${startHour}:${startMinute}`;
+    
+    const endDate = new Date(date);
+    endDate.setHours(endDate.getHours() + 1);
+    const endHour = String(endDate.getHours()).padStart(2, '0');
+    const endMinute = String(endDate.getMinutes()).padStart(2, '0');
+    endTimeInput.value = `${endHour}:${endMinute}`;
+    
+    allDayCheckbox.checked = false;
+    timeSelection.style.display = "block";
+  } else {
+    allDayCheckbox.checked = true;
+    timeSelection.style.display = "none";
+    startTimeInput.value = "09:00";
+    endTimeInput.value = "10:00";
+  }
+  
   displayTasksForSelectedDate(date); 
   taskModal.style.display = "block"; 
   newTaskInput.focus();
 }
 
-/*
-  function onDayClick(date) {
-    const input = prompt(`Task für ${date.toLocaleDateString("de-DE")} eingeben:`);
-    if (input) 
-    {
-      const timestamp = Math.floor(date.getTime() / 1000);
-      saveTaskToDatabase(timestamp, input);
-    }
-  }
-*/
   render();
 </script>
