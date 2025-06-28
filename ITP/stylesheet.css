@@ -70,7 +70,7 @@ body {
 
 /* Month View Specifics */
 #calendarGrid.month {
-    display: flex; /* Overrides grid for month view container layout */
+    display: flex; 
     justify-content: center;
     max-width: 900px;
     margin: 0 auto;
@@ -107,7 +107,7 @@ body {
 .month .days {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    grid-auto-rows: 110px; 
+    grid-auto-rows: 110px;
     gap: 0.5rem;
     font-size: 1rem;
 }
@@ -166,7 +166,7 @@ body {
     right: 3px;
     width: 6px;
     height: 6px;
-    background-color: #ff0000; /* Red dot */
+    background-color: #ff0000; 
     border-radius: 50%;
 }
 
@@ -185,7 +185,7 @@ body {
 }
 
 #calendarGrid.year .month .days {
-    grid-auto-rows: 80px; /* Shorter rows for year view */
+    grid-auto-rows: 80px;
 }
 
 #calendarGrid.year .day {
@@ -213,7 +213,6 @@ body {
     margin: 0 auto;
 }
 
-/* Modal Styles (General) */
 .modal {
     display: none;
     position: fixed;
@@ -252,8 +251,7 @@ body {
     cursor: pointer;
 }
 
-/* Task List in Modals (if applicable) */
-#tasksList div { /* This likely targets task items within a modal list */
+#tasksList div {
     padding: 0.75rem;
     margin-bottom: 0.5rem;
     border: 1px solid #ddd;
@@ -278,7 +276,6 @@ body {
     background-color: #c62828;
 }
 
-/* Add Task Form in Modals */
 #addTaskForm {
     margin-top: 20px;
     border-top: 1px solid #eee;
@@ -312,8 +309,6 @@ body {
     background-color: #45a049;
 }
 
-
-/* Form Grouping for Inputs (e.g., in modals) */
 .form-group {
     margin-bottom: 1rem;
 }
@@ -357,7 +352,6 @@ body {
     font-size: 1rem;
 }
 
-/* Checkbox Styles */
 .checkbox-container {
     display: block;
     position: relative;
@@ -420,7 +414,6 @@ body {
     transform: rotate(45deg);
 }
 
-/* Task Item Styles (Generic, likely for modal lists) */
 .task-item {
     display: flex;
     justify-content: space-between;
@@ -458,7 +451,7 @@ body {
 }
 
 
-/* DAY VIEW (TAGESANSICHT) SPECIFIC STYLES */
+/* Day View Specifics */
 
 .day-view {
     display: flex;
@@ -474,15 +467,15 @@ body {
 
 .time-grid {
     display: grid;
-    grid-template-rows: repeat(24, 1fr); /* 24 rows, each taking equal fraction of space */
-    gap: 0.5rem; /* Gap between hour blocks */
+    grid-template-rows: repeat(24, 1fr);
+    gap: 0.5rem;
     width: 100%;
-    position: relative; /* Needed if you want to position anything relative to the grid itself */
+    position: relative; 
 }
 
 .hour-block {
     background-color: #fff;
-    padding: 1rem 1.5rem; /* Padding for the hour text and tasks */
+    padding: 1rem 1.5rem;
     border: 1px solid #ccc;
     border-radius: 12px;
     font-size: 1.1rem;
@@ -490,16 +483,15 @@ body {
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     text-align: left;
     transition: background-color 0.2s ease, transform 0.1s ease;
-    min-height: 80px; /* Minimum height for each hour block */
-    position: relative; /* CRUCIAL for the ::after pseudo-element (the dot) */
-    display: flex; /* Use flexbox to stack time and task summary */
+    min-height: 80px; 
+    position: relative; 
+    display: flex; 
     flex-direction: column;
-    justify-content: flex-start; /* Align content to the top */
-    align-items: flex-start; /* Align content to the left */
-    overflow: hidden; /* Hide anything that overflows the block */
+    justify-content: flex-start; 
+    align-items: flex-start; 
+    overflow: hidden;
 }
 
-/* Hover effect for hour blocks */
 .day-view .hour-block:hover {
     background-color: #e0e0e0;
     transform: scale(1.01);
@@ -508,64 +500,52 @@ body {
 
 .hour-block strong {
     font-weight: 600;
-    display: block; /* Ensures it takes its own line */
-    margin-bottom: 0.5rem; /* Space below the hour label */
+    display: block;
+    margin-bottom: 0.5rem;
     color: #333;
 }
 
-/* NEW: Styles for hour blocks that contain tasks in Day View */
 .hour-block.has-task-in-hour {
-    background-color: #e6ffe6; /* Light green background */
-    border: 1px solid #66bb6a; /* Green border */
-    /* position: relative; is already on .hour-block, so no need to repeat */
+    background-color: #e6ffe6; 
+    border: 1px solid #66bb6a; 
 }
 
-/* NEW: Red dot indicator for hour blocks with tasks */
 .hour-block.has-task-in-hour::after {
     content: '';
     position: absolute;
-    bottom: 8px; /* Position from bottom */
-    right: 8px; /* Position from right */
-    width: 8px; /* Size of the dot */
-    height: 8px; /* Size of the dot */
-    background-color: #ff0000; /* Red dot color */
-    border-radius: 50%; /* Makes it a circle */
-    box-shadow: 0 0 5px rgba(255, 0, 0, 0.5); /* Optional subtle glow */
+    bottom: 8px; 
+    right: 8px; 
+    width: 8px; 
+    height: 8px; 
+    background-color: #ff0000; 
+    border-radius: 50%; 
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.5); 
 }
 
-/* NEW: Container for the task summary text within an hour block */
 .hour-block .tasks-summary {
-    margin-top: 5px; /* Space between time label and task list */
+    margin-top: 5px;
     font-size: 0.85rem;
     color: #555;
     line-height: 1.3;
-    overflow: hidden; /* Hide overflowing text if summary is too long */
-    /* Calculated max-height to ensure it doesn't push the hour-block too much,
-       assuming hourBlock min-height 80px, padding-top 1rem (16px), strong margin-bottom 0.5rem (8px),
-       and tasks-summary margin-top 5px. This leaves about 51px for content. */
+    overflow: hidden; 
     max-height: calc(80px - 16px - 8px - 5px);
 }
 
-/* NEW: Style for each individual task line in the summary */
 .hour-block .task-display-line {
-    margin: 0; /* Remove default paragraph margins */
-    padding: 2px 0; /* Small vertical padding for separation */
-    white-space: nowrap; /* Keep text on a single line */
-    overflow: hidden; /* Hide text that goes beyond the container */
-    text-overflow: ellipsis; /* Add "..." for hidden text */
-    font-size: 0.8em; /* Slightly smaller text for task entries */
+    margin: 0;
+    padding: 2px 0;
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    font-size: 0.8em;
 }
 
-/* NEW: Specific styling for all-day task lines in the summary */
 .hour-block .task-display-line.all-day-task-display {
     font-weight: bold;
-    color: #388e3c; /* Darker green for all-day tasks */
+    color: #388e3c;
 }
 
-/* GENERAL TASK IN HOUR (if used in modal for example) - No longer for day view hour blocks */
 .task-in-hour {
-    /* If this class is used to display tasks in other contexts (e.g., in a modal list of tasks),
-       keep its styling as needed. It should NOT be absolutely positioned for the Day View. */
     padding: 0.4rem;
     background-color: #e0f2f7;
     border-left: 4px solid #007acc;
@@ -578,8 +558,8 @@ body {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    position: relative; /* Set to relative if it's meant to flow normally in lists */
-    margin-bottom: 5px; /* Add some spacing if it's a list item */
+    position: relative; 
+    margin-bottom: 5px;
 }
 
 .task-in-hour.all-day-task {

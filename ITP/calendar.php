@@ -164,49 +164,60 @@
 
   async function fetchTasks() 
   {
-      try 
-      {
-          let startTimestamp = null;
-          let endTimestamp = null;
+    try 
+    {
+        let startTimestamp = null;
+        let endTimestamp = null;
 
-          if (viewMode === "year") 
-          {
-              startTimestamp = Math.floor(new Date(currentDate.getFullYear(), 0, 1).getTime() / 1000);
-              endTimestamp = Math.floor(new Date(currentDate.getFullYear(), 11, 31, 23, 59, 59).getTime() / 1000);
-          } else if (viewMode === "month") {
-              startTimestamp = Math.floor(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getTime() / 1000);
-              endTimestamp = Math.floor(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59).getTime() / 1000);
-          } else if (viewMode === "week") {
-              const startOfWeek = new Date(currentDate);
-              const dayOfWeek = startOfWeek.getDay();
-              const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek
-              startOfWeek.setDate(startOfWeek.getDate() + diff);
-              startOfWeek.setHours(0, 0, 0, 0);
+        if (viewMode === "year") 
+        {
+            startTimestamp = Math.floor(new Date(currentDate.getFullYear(), 0, 1).getTime() / 1000);
+            endTimestamp = Math.floor(new Date(currentDate.getFullYear(), 11, 31, 23, 59, 59).getTime() / 1000);
+        } else if (viewMode === "month") {
+            startTimestamp = Math.floor(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getTime() / 1000);
+            endTimestamp = Math.floor(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59).getTime() / 1000);
+        } else if (viewMode === "week") {
+            const startOfWeek = new Date(currentDate);
+            const dayOfWeek = startOfWeek.getDay();
+            const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek
+            startOfWeek.setDate(startOfWeek.getDate() + diff);
+            startOfWeek.setHours(0, 0, 0, 0);
 
-              const endOfWeek = new Date(startOfWeek);
-              endOfWeek.setDate(endOfWeek.getDate() + 6);
-              endOfWeek.setHours(23, 59, 59, 999);
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(endOfWeek.getDate() + 6);
+            endOfWeek.setHours(23, 59, 59, 999);
 
-              startTimestamp = Math.floor(startOfWeek.getTime() / 1000);
-              endTimestamp = Math.floor(endOfWeek.getTime() / 1000);
-          }
+            startTimestamp = Math.floor(startOfWeek.getTime() / 1000);
+            endTimestamp = Math.floor(endOfWeek.getTime() / 1000);
+        } else if (viewMode === "day") {
+            const startOfDay = new Date(currentDate);
+            startOfDay.setHours(0, 0, 0, 0);
+            const endOfDay = new Date(currentDate);
+            endOfDay.setHours(23, 59, 59, 999);
+            startTimestamp = Math.floor(startOfDay.getTime() / 1000);
+            endTimestamp = Math.floor(endOfDay.getTime() / 1000);
+        }
 
-          const url = `fetch_task.php?start=${startTimestamp}&end=${endTimestamp}`;
-          const response = await fetch(url);
-          const data = await response.json();
+        if (startTimestamp === null || endTimestamp === null) {
+            console.error("Timestamps not set for fetch.");
+            return;
+        }
 
-          if (data.success) 
-          {
-              userTasks = data.tasks;
-              console.log("Fetched tasks:", userTasks);
-          } else {
-              console.error("Error fetching tasks:", data.message);
-              userTasks = [];
-          }
-      } catch (error) {
-          console.error("Network or parsing error fetching tasks:", error);
-          userTasks = [];
-      }
+        const url = `fetch_task.php?start=${startTimestamp}&end=${endTimestamp}`;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.success) 
+        {
+            userTasks = data.tasks;
+        } else {
+            console.error("Error fetching tasks:", data.message);
+            userTasks = [];
+        }
+    } catch (error) {
+        console.error("Network or parsing error fetching tasks:", error);
+        userTasks = [];
+    }
   }
 
   async function render()
