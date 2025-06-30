@@ -1,16 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalender</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <?php include './includes/header.php'; ?>
-</head>
-<body>
-    <body class="container mt-5">
-        <h1>Kalender:</h1>
-        <img src="img/Kalender.png" alt="Beispiel Kalender" width="1100" height="600">
+<?php include './includes/header.php'; ?> 
 
-    </body>
-</html>
+<div class="container mt-5 text-center">
+    <h1 class="display-4 mb-4">Willkommen bei <span class="text-primary">Taskly</span></h1>
+    <p class="lead mb-5">Dein smarter Kalender für Tages-, Wochen- und Monatsplanung</p>
+
+    <?php if (!isset($_SESSION['username'])): ?>
+        <a href="register.php" class="btn btn-dark btn-lg me-2">Jetzt registrieren</a>
+        <a href="login.php" class="btn btn-outline-dark btn-lg">Login</a>
+    <?php else: ?>
+        <a href="calendar.php" class="btn btn-success btn-lg">Zum Kalender</a>
+    <?php endif; ?>
+</div>
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Funktionen auf einen Blick</h2>
+    <div class="row text-center g-4">
+        <div class="col-md-4">
+            <div class="p-4 bg-white shadow rounded">
+                <h4>Tagesansicht</h4>
+                <p>Stundenweise Planung mit Task-Übersicht und Zeitdetails.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-4 bg-white shadow rounded">
+                <h4>Wochenansicht</h4>
+                <p>Alle Tasks der Woche im Überblick – ideal zur Organisation.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-4 bg-white shadow rounded">
+                <h4>Monatsansicht</h4>
+                <p>Langfristig planen mit Task-Markierungen in der Übersicht.</p>
+            </div>
+        </div>
+    </div>
+
+    

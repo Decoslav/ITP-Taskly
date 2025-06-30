@@ -402,6 +402,13 @@
   {
     const monthEl = document.createElement("div");
     monthEl.className = "month";
+    
+    if(viewMode === "year") {
+    const monthTitle = document.createElement("h3");
+    monthTitle.textContent = date.toLocaleString("de-DE", { month: "long" });
+    monthTitle.className = "month-title";
+    monthEl.appendChild(monthTitle);
+    }
 
     const wrapper = document.createElement("div");
     wrapper.appendChild(createWeekdayHeader());

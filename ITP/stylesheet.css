@@ -571,3 +571,24 @@ body {
     background-color: #ffe0b2;
     border-left-color: #fb8c00;
 }
+
+.container h1 span.text-primary {
+    color: #000000;
+    font-weight: bold;
+}
+
+.shadow {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+}
+
+.bg-white {
+    background-color: #ffffff;
+}
+
+.month-title {
+    text-align: center;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
