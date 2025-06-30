@@ -39,7 +39,9 @@ session_start();
                 <ul class="navbar-nav ms-auto">
                     <?php if (isset($_SESSION['username'])): ?>
                         <li class="nav-item">
-                            <span class="navbar-text me-3">Willkommen, <strong><?= htmlspecialchars($_SESSION['username']) ?></strong></span>
+                            <a class="nav-link disabled" tabindex="-1" aria-disabled="true">
+                            Willkommen, <strong><?= htmlspecialchars($_SESSION['username']) ?></strong>
+                            </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="logout.php">Ausloggen</a>
